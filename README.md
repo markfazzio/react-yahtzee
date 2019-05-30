@@ -1,4 +1,6 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# React Yahtzee!
+
+Created with [Create React App](https://github.com/facebook/create-react-app), React 16, Context API, CSS3 animations, and HTML5 form validation.
 
 ## Available Scripts
 
