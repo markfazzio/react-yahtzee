@@ -25,7 +25,9 @@ class Scoreboard extends Component {
       // turnsRemaining,
       rollsRemaining,
       isRolling,
-      diceTotal
+      diceTotal,
+      upperTotal,
+      lowerTotal
     } = this.props;
 
     return (
@@ -163,7 +165,7 @@ class Scoreboard extends Component {
                             type="number"
                             min={35}
                             max={35}
-                            value={ context.getUpperTotal() >= 63 ? 35 : 0 }
+                            value={ upperTotal >= 63 ? 35 : 0 }
                             readOnly
                           />
                         </td>
@@ -175,7 +177,7 @@ class Scoreboard extends Component {
                             className="form-control" 
                             type="number"
                             max={105}
-                            value={context.getUpperTotal()}                            
+                            value={upperTotal}                            
                             readOnly
                           />
                         </td>
@@ -319,7 +321,7 @@ class Scoreboard extends Component {
                             className="form-control" 
                             type="number" 
                             readOnly
-                            value={context.getLowerTotal()}                            
+                            value={lowerTotal}                            
                           />
                         </td>
                       </tr>

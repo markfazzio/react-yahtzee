@@ -430,6 +430,8 @@ class Game extends Component {
                                     rollsRemaining={rollsRemaining} 
                                     isRolling={isRolling}
                                     diceTotal={this.getDiceTotal()}
+                                    upperTotal={this.getUpperTotal()}
+                                    lowerTotal={this.getLowerTotal()}
                                 />
                             </div>
                         </div>
