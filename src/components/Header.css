@@ -1,0 +1,16 @@
+.game__nav {
+    background: #333;
+    padding: 10px 15px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 10;
+}
+
+.game__turn-info p {
+    margin: 0;
+}
+
+.game__nav .row {
+    align-items: center;
+}

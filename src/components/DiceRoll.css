@@ -1,0 +1,6 @@
+.dice-roll__dice {
+    display: flex;
+    justify-content: space-evenly;
+    max-width: 480px;
+    margin: 30px auto 15px;
+}
