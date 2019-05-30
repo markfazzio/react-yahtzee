@@ -71,7 +71,7 @@ class Game extends Component {
     // validating score
     // has all of the logic for validating the column submissions
     // SO DONT TRY TO CHEAT! >__<
-    validateColumn = (column, score) => {
+    validateColumn = (column, score, form) => {
         
         let validValues = [];
         let i;
@@ -79,7 +79,7 @@ class Game extends Component {
         
         const scoreNum = parseInt(score);
 
-        if (!scoreNum) {
+        if (isNaN(scoreNum)) {
             return false;
         }
 
@@ -128,14 +128,14 @@ class Game extends Component {
         }
 
         // first we make sure the value is valid for the column
-        const isValidValue = validValues.includes(scoreNum);
+        const isValidValue = scoreNum === 0 || validValues.includes(scoreNum);
 
         // next we make sure the user is not lying
         // we check the dice to see if they match what is being put in the column
         const valueAlignsWithDice = this.checkValueAgainstDice(colNum, scoreNum);
 
         // allow 0, but also make sure its an accepted value for that category
-        if ((scoreNum === 0 || isValidValue) && valueAlignsWithDice) {
+        if (isValidValue && valueAlignsWithDice) {
             this.setState({
                 validationMessages: []
             });
@@ -155,32 +155,39 @@ class Game extends Component {
 
         // build our dice numbers array
         dice.map((d, index) => {
-            diceNums.push(d.value);
+            return diceNums.push(d.value);
         });
 
-        // build our count object
+        // get our dice counts - build count {} object
         diceNums.forEach(number => count[number] = (count[number] || 0) + 1);
 
-        // check column, multiply by dice count to get true total
-        const colCount = count[colNum];
-        const acceptedColValue = colNum * colCount;
+        // only for ones through sixes columns
+        if(DICE_SIDES.includes(parseInt(colNum))) {
+            // for ones through sixes check column, multiply by dice count to get true total
+            const colCount = count[colNum];
+            const acceptedColValue = colNum * colCount;
 
-        // make sure score equal to accepted col value
-        if (scoreVal === acceptedColValue) {
-            return true;
+            // make sure score equal to accepted col value
+            if (scoreVal === acceptedColValue || scoreVal === 0) {
+                return true;
+            } else {
+
+                const colCountText = colCount ? colCount : 'no';
+
+                validationMessages.push({
+                    'label' : 'Invalid column score!',
+                    'message' : `You have ${colCountText} ${colNum}'s, you cannot put ${scoreVal} in this column.`,
+                    'variant' : 'danger'
+                });
+
+                this.setState({
+                    validationMessages : validationMessages
+                }, () => {
+                    return false;
+                });
+            }
         } else {
-
-            validationMessages.push({
-                'label' : 'Invalid column score!',
-                'message' : `You have ${colCount} ${colNum}'s, you cannot put ${scoreVal} in this column.`,
-                'variant' : 'danger'
-            });
-
-            this.setState({
-                validationMessages : validationMessages
-            }, () => {
-                return false;
-            });
+            return true;
         }
     }
 
@@ -267,8 +274,8 @@ class Game extends Component {
         });
     };
 
-    submitScoreColumn = (column, score) => {
-        const isValid = this.validateColumn(column, score);
+    submitScoreColumn = (column, score, form) => {
+        const isValid = this.validateColumn(column, parseInt(score), form);
 
         if (isValid) {
             this.setState(prevState => ({
