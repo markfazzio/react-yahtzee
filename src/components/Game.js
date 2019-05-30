@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 import Header from './Header';
 import Instructions from './Instructions';
 import DiceRoll from './DiceRoll';
-import Yahtzee from './Yahtzee';
 import Scoreboard from './Scoreboard';
+import ValidationMessage from './ValidationMessage';
 import { GameProvider } from "./GameContext";
 
 import './Game.css';
@@ -18,30 +18,31 @@ class Game extends Component {
         super(props);
 
         this.state = {
-            turnsRemaining    : 13,
-            isRolling         : false,
-            rollsRemaining    : DEFAULT_ROLLS_INT,
-            ones              : '',
-            twos              : '',
-            threes            : '',
-            fours             : '',
-            fives             : '',
-            sixes             : '',
-            three_of_a_kind   : '',
-            four_of_a_kind    : '',
-            full_house        : '',
-            small_straight    : '',
-            large_straight    : '',
-            yahtzee           : '',
-            chance            : '',
-            rollDice          : this.rollDice,
-            onDieClick        : this.onDieClick,
-            submitScoreColumn : this.submitScoreColumn,
-            getUpperTotal     : this.getUpperTotal,
-            getLowerTotal     : this.getLowerTotal,
-            getDiceTotal      : this.getDiceTotal,
-            getTotalScore     : this.getTotalScore,
-            lastMove          : null,
+            turnsRemaining     : 13,
+            isRolling          : false,
+            rollsRemaining     : DEFAULT_ROLLS_INT,
+            ones               : '',
+            twos               : '',
+            threes             : '',
+            fours              : '',
+            fives              : '',
+            sixes              : '',
+            three_of_a_kind    : '',
+            four_of_a_kind     : '',
+            full_house         : '',
+            small_straight     : '',
+            large_straight     : '',
+            yahtzee            : '',
+            chance             : '',
+            rollDice           : this.rollDice,
+            onDieClick         : this.onDieClick,
+            submitScoreColumn  : this.submitScoreColumn,
+            getUpperTotal      : this.getUpperTotal,
+            getLowerTotal      : this.getLowerTotal,
+            getDiceTotal       : this.getDiceTotal,
+            getTotalScore      : this.getTotalScore,
+            lastMove           : null,
+            validationMessages : [],
             dice: [
                 {
                     held: false,
@@ -74,25 +75,37 @@ class Game extends Component {
         
         let validValues = [];
         let i;
+        let colNum = null;
+        
         const scoreNum = parseInt(score);
+
+        if (!scoreNum) {
+            return false;
+        }
 
         switch(column) {
             case 'ones':
+                colNum = 1;
                 validValues.push(1,2,3,4,5);
                 break;
             case 'twos':
+                colNum = 2;
                 validValues.push(2,4,6,8,10);
                 break;
             case 'threes':
+                colNum = 3;
                 validValues.push(3,6,9,12,15);
                 break;
             case 'fours':
+                colNum = 4;
                 validValues.push(4,8,12,16,20);
                 break;
             case 'fives':
+                colNum = 5;
                 validValues.push(5,10,15,20,25);
                 break;
             case 'sixes':
+                colNum = 6;
                 validValues.push(6,12,18,24,30);
                 break;
             case 'full_house':
@@ -119,24 +132,56 @@ class Game extends Component {
 
         // next we make sure the user is not lying
         // we check the dice to see if they match what is being put in the column
-        const valueAlignsWithDice = this.checkValueAgainstDice(column, scoreNum);
+        const valueAlignsWithDice = this.checkValueAgainstDice(colNum, scoreNum);
 
         // allow 0, but also make sure its an accepted value for that category
-        if ((scoreNum === 0 || isValidValue) && valueAlignsWithDice)
+        if ((scoreNum === 0 || isValidValue) && valueAlignsWithDice) {
+            this.setState({
+                validationMessages: []
+            });
             return true;
-        else
+        } else {
             return false;
+        }
     }
 
-    // TODO: implement.
-    checkValueAgainstDice = (column, scoreVal) => {
+    checkValueAgainstDice = (colNum, scoreVal) => {
         const { dice } = this.state;
-        
-        console.log(column);
-        console.log(scoreVal);
-        console.log(dice);
 
-        return true;
+        // const diceTotal = this.getDiceTotal();
+        let diceNums = [];
+        let count = {};
+        let validationMessages = [];
+
+        // build our dice numbers array
+        dice.map((d, index) => {
+            diceNums.push(d.value);
+        });
+
+        // build our count object
+        diceNums.forEach(number => count[number] = (count[number] || 0) + 1);
+
+        // check column, multiply by dice count to get true total
+        const colCount = count[colNum];
+        const acceptedColValue = colNum * colCount;
+
+        // make sure score equal to accepted col value
+        if (scoreVal === acceptedColValue) {
+            return true;
+        } else {
+
+            validationMessages.push({
+                'label' : 'Invalid column score!',
+                'message' : `You have ${colCount} ${colNum}'s, you cannot put ${scoreVal} in this column.`,
+                'variant' : 'danger'
+            });
+
+            this.setState({
+                validationMessages : validationMessages
+            }, () => {
+                return false;
+            });
+        }
     }
 
     generateDice = () => {
@@ -169,7 +214,8 @@ class Game extends Component {
                     { held: false, value: roll[4] }
                 ],
                 isRolling: true,
-                rollsRemaining: prevState.rollsRemaining - 1
+                rollsRemaining: prevState.rollsRemaining - 1,
+                validationMessages: []
             }));
 
         } else {
@@ -345,8 +391,10 @@ class Game extends Component {
             turnsRemaining,
             rollsRemaining,
             isRolling,
-            lastMove
+            lastMove,
+            validationMessages
         } = this.state;
+
         const totalScore = this.getTotalScore();
 
         return (
@@ -361,13 +409,21 @@ class Game extends Component {
                         <div className="row">
                             <div className="col-sm-12">
                                 <Instructions />
-                                { this.checkForYahtzee() ? <Yahtzee /> : undefined }
                                 <DiceRoll 
                                     turnsRemaining={turnsRemaining}
                                     rollsRemaining={rollsRemaining} 
                                     isRolling={isRolling}
                                 />
-                                <Scoreboard />
+                                <ValidationMessage 
+                                    messages={validationMessages}
+                                    yahtzee={this.checkForYahtzee()}    
+                                />
+                                <Scoreboard
+                                    turnsRemaining={turnsRemaining}
+                                    rollsRemaining={rollsRemaining} 
+                                    isRolling={isRolling}
+                                    diceTotal={this.getDiceTotal()}
+                                />
                             </div>
                         </div>
                     </div>

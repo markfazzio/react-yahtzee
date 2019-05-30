@@ -3,6 +3,10 @@ import { GameConsumer } from "./GameContext";
 
 import "./Scoreboard.css";
 
+// TODO: pull these from settings
+const DICE_MIN = 0;
+const DICE_MAX = 30;
+
 class Scoreboard extends Component {
   
   constructor(props) {
@@ -20,6 +24,13 @@ class Scoreboard extends Component {
   }
 
   render() {
+
+    const {
+      turnsRemaining,
+      rollsRemaining,
+      isRolling,
+      diceTotal
+    } = this.props;
 
     return (
       <GameConsumer>
@@ -41,11 +52,11 @@ class Scoreboard extends Component {
                             required
                             className="form-control"
                             type="number"
-                            min={0}
+                            min={DICE_MIN}
                             max={5}
                             step={1}
                             defaultValue={ context.ones }
-                            disabled={ context.ones || context.rollsRemaining > 0 }
+                            disabled={ context.ones || rollsRemaining > 0 || isRolling }
                             onBlur={ (e) => { context.submitScoreColumn('ones', e.target.value) } }
                           />
                         </td>
@@ -61,11 +72,11 @@ class Scoreboard extends Component {
                             required
                             className="form-control"
                             type="number"
-                            min={0}
+                            min={DICE_MIN}
                             max={10}
                             step={2}
                             defaultValue={ context.twos }
-                            disabled={ context.twos || context.rollsRemaining > 0 }
+                            disabled={ context.twos || rollsRemaining > 0 || isRolling }
                             onBlur={ (e) => { context.submitScoreColumn('twos', e.target.value) } }
                           />
                         </td>
@@ -81,11 +92,11 @@ class Scoreboard extends Component {
                             required
                             className="form-control"
                             type="number"
-                            min={0}
+                            min={DICE_MIN}
                             max={15}
                             step={3}
                             defaultValue={ context.threes }
-                            disabled={ context.threes || context.rollsRemaining > 0 }
+                            disabled={ context.threes || rollsRemaining > 0 || isRolling }
                             onBlur={ (e) => { context.submitScoreColumn('threes', e.target.value) } }
                           />
                         </td>
@@ -101,11 +112,11 @@ class Scoreboard extends Component {
                             required
                             className="form-control"
                             type="number"
-                            min={0}
+                            min={DICE_MIN}
                             max={20}
                             step={4}
                             defaultValue={ context.fours }
-                            disabled={ context.fours || context.rollsRemaining > 0 }
+                            disabled={ context.fours || rollsRemaining > 0 || isRolling }
                             onBlur={ (e) => { context.submitScoreColumn('fours', e.target.value) } }
                           />
                         </td>
@@ -121,11 +132,11 @@ class Scoreboard extends Component {
                             required
                             className="form-control"
                             type="number"
-                            min={0}
+                            min={DICE_MIN}
                             max={25}
                             step={5}
                             defaultValue={ context.fives }
-                            disabled={ context.fives || context.rollsRemaining > 0 }
+                            disabled={ context.fives || rollsRemaining > 0 || isRolling }
                             onBlur={ (e) => { context.submitScoreColumn('fives', e.target.value) } }
                           />
                         </td>
@@ -141,11 +152,11 @@ class Scoreboard extends Component {
                             required
                             className="form-control"
                             type="number"
-                            min={0}
+                            min={DICE_MIN}
                             max={30}
                             step={6}
                             defaultValue={ context.sixes }
-                            disabled={ context.sixes || context.rollsRemaining > 0 }
+                            disabled={ context.sixes || rollsRemaining > 0 || isRolling }
                             onBlur={ (e) => { context.submitScoreColumn('sixes', e.target.value) } }
                           />
                         </td>
@@ -198,10 +209,10 @@ class Scoreboard extends Component {
                             required
                             className="form-control"
                             type="number"
-                            min={0}
-                            max={30}
+                            min={DICE_MIN}
+                            max={diceTotal ? diceTotal : DICE_MAX}
                             defaultValue={ context.three_of_a_kind }
-                            disabled={ context.three_of_a_kind || context.rollsRemaining > 0 }
+                            disabled={ context.three_of_a_kind || rollsRemaining > 0 || isRolling }
                             onBlur={ (e) => { context.submitScoreColumn('three_of_a_kind', e.target.value) } }
                           />
                         </td>
@@ -217,10 +228,10 @@ class Scoreboard extends Component {
                             required
                             className="form-control"
                             type="number"
-                            min={0}
-                            max={30}
+                            min={DICE_MIN}
+                            max={diceTotal ? diceTotal : DICE_MAX}
                             defaultValue={ context.four_of_a_kind }
-                            disabled={ context.four_of_a_kind || context.rollsRemaining > 0 }
+                            disabled={ context.four_of_a_kind || rollsRemaining > 0 || isRolling }
                             onBlur={ (e) => { context.submitScoreColumn('four_of_a_kind', e.target.value) } }
                           />
                         </td>
@@ -239,7 +250,7 @@ class Scoreboard extends Component {
                             min={25}
                             max={25}
                             defaultValue={ context.full_house }
-                            disabled={ context.full_house || context.rollsRemaining > 0 }
+                            disabled={ context.full_house || rollsRemaining > 0 || isRolling }
                             onBlur={ (e) => { context.submitScoreColumn('full_house', e.target.value) } }
                           />
                         </td>
@@ -258,7 +269,7 @@ class Scoreboard extends Component {
                             min={30}
                             max={30}
                             defaultValue={ context.small_straight }
-                            disabled={ context.small_straight || context.rollsRemaining > 0 }
+                            disabled={ context.small_straight || rollsRemaining > 0 || isRolling }
                             onBlur={ (e) => { context.submitScoreColumn('small_straight', e.target.value) } }
                           />
                         </td>
@@ -277,7 +288,7 @@ class Scoreboard extends Component {
                             min={40}
                             max={40}
                             defaultValue={ context.large_straight }
-                            disabled={ context.large_straight || context.rollsRemaining > 0 }
+                            disabled={ context.large_straight || rollsRemaining > 0 || isRolling }
                             onBlur={ (e) => { context.submitScoreColumn('large_straight', e.target.value) } }
                           />
                         </td>
@@ -296,7 +307,7 @@ class Scoreboard extends Component {
                             min={50}
                             max={50}
                             defaultValue={ context.yahtzee }
-                            disabled={ context.yahtzee || context.rollsRemaining > 0 }
+                            disabled={ context.yahtzee || rollsRemaining > 0 || isRolling }
                             onBlur={ (e) => { context.submitScoreColumn('yahtzee', e.target.value) } }
                           />
                         </td>
@@ -313,9 +324,9 @@ class Scoreboard extends Component {
                             className="form-control"
                             type="number"
                             min={0}
-                            max={30}
+                            max={diceTotal ? diceTotal : DICE_MAX}
                             defaultValue={ context.chance }
-                            disabled={ context.chance || context.rollsRemaining > 0 }
+                            disabled={ context.chance || rollsRemaining > 0 || isRolling }
                             onBlur={ (e) => { context.submitScoreColumn('chance', e.target.value) } }
                           />
                         </td>

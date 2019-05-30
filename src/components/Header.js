@@ -22,7 +22,7 @@ class Header extends Component {
                         }
                     </div>
                     <div className="col-md-2 text-center">
-                        Score: <strong>{score}</strong>
+                        <h4>Score: <span className="text-warning">{score}</span></h4>
                     </div>
                     <div className="col-md-5 text-right">
                         <button className="btn btn-success" disabled={turnsRemaining > 0}>
